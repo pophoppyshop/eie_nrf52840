@@ -6,3 +6,6 @@ git push
 git merge
 git rebase -- changes the main
 git fetch
+git add -- add from git
+git status 
+git log
