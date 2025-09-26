@@ -1,1 +1,8 @@
-
+git commit
+git branch
+git checkout -- moves to
+git pull -- updates
+git push
+git merge
+git rebase -- changes the main
+git fetch
