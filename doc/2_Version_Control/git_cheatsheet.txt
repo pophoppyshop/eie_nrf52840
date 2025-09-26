@@ -10,3 +10,4 @@ git add -- add from git
 git status 
 git log
 git push -u -- -u for the first time
+git diff -- shows difference in files
