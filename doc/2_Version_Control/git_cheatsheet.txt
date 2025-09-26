@@ -1,5 +1,5 @@
 git commit
-git branch -- shows branch
+git branch -- shows branch, put a branch name to create branch
 git checkout -- moves to
 git pull -- updates
 git push
