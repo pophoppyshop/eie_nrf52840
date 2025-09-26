@@ -100,6 +100,7 @@ To do so, we're going to go through a set of lessons and exercises:
     13. "Push" your new `lesson2` branch and its commit to your fork of the EiE project repo on GitHub with `git push -u lesson2`
         1. You will be prompted for/asked to set your GitHub username and password if you haven't pushed to GitHub before
         2. The `-u lesson2` is only needed because this is the *first* time that we're pushing the `lesson2` branch to GitHub (it tells GitHub to make this new branch on the remote). After this, you should only run `git push`.
+            1. **If you run into an issue where Git asks for your password but fails with an error saying "Password authentication is disabled", see the "Personal Access Tokens" section below.**
     14. Check on GitHub that **your fork** of the `eie_nrf52840` repo has a new `lesson2` branch, and that your cheatsheet is on it
 3. Congratulations! You've now completed an initial Git workflow!
 4. You've now learned a few new Git commands, why not add them to your cheatsheet?
@@ -135,3 +136,23 @@ In general, a good Git process to follow for EiE is as follows:
 5. At the end of the lesson, push your `lesson#` branch to GitHub
 
 Of course, feel free to experiment with different workflows, but always be prepeared to explain what you've done to anyone you're expecting help from!
+
+## Personal Access Tokens
+
+GitHub disabled password authentication a while ago.
+Instead of a password, you need to use a "Personal Access Token".
+We can generate one as follows:
+
+1. Run `git config credential.helper 'store'` in your terminal
+2. On GitHub, go to your user settings
+3. Scroll down and select "Developer Settings" from the menu on the left
+4. Select "Personal Access Tokens" from the menu on the left
+5. Select "Tokens (classic)", then "Generate new token (classic)"
+6. Give the token a name like "Git Bash Laptop" or similar
+7. Set the expiration to either "90 days" or "No expiration"
+    1. If you set an expiration, you'll have to repeat this process after the token expires
+8. Check the "repo" tick box
+9. Hit "Generate"
+10. Copy the token from GitHub
+11. From the command line, run your `git push` command again, enter your username as normal, but instead of a password, press `ctrl+shft+V` to paste the access token
+12. Press enter, and everything should work!
