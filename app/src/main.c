@@ -56,11 +56,21 @@ int main(void) {
 
         gpio_pin_toggle_dt(&led2);
 
-        k_msleep(200);
+        gpio_pin_toggle_dt(&led3);
+
+        k_msleep(100);
 
         gpio_pin_toggle_dt(&led3);
 
-        k_msleep(200);
+        k_msleep(100);
+
+        gpio_pin_toggle_dt(&led3);
+
+        k_msleep(100);
+
+        gpio_pin_toggle_dt(&led3);
+
+        k_msleep(100);
     }
 
     return 0;
