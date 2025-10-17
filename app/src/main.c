@@ -15,6 +15,13 @@ static const struct gpio_dt_spec led1 = GPIO_DT_SPEC_GET(LED1_NODE, gpios);
 static const struct gpio_dt_spec led2 = GPIO_DT_SPEC_GET(LED2_NODE, gpios);
 static const struct gpio_dt_spec led3 = GPIO_DT_SPEC_GET(LED3_NODE, gpios);
 
+void TurnOnLED(const struct gpio_dt_spec led, int duration_ms) {
+    gpio_pin_toggle_dt(&led);
+
+    k_msleep(duration_ms);
+
+    gpio_pin_toggle_dt(&led);
+}
 
 int main(void) {
     int ret;
@@ -47,30 +54,30 @@ int main(void) {
     if (ret < 0) {
         return ret;
     }
+
+    // Turn off all LEDs
+    gpio_pin_toggle_dt(&led0);
+    gpio_pin_toggle_dt(&led1);
+    gpio_pin_toggle_dt(&led2);
+    gpio_pin_toggle_dt(&led3);
     
 
     while (1) {
-        gpio_pin_toggle_dt(&led0);
+        
+        for (int i =0; i < 5; i++){
+            TurnOnLED(led0, 100);
+            TurnOnLED(led1, 100);
+            TurnOnLED(led3, 100);
+            TurnOnLED(led2, 100);
+        }
 
-        gpio_pin_toggle_dt(&led1);
-
-        gpio_pin_toggle_dt(&led2);
-
-        gpio_pin_toggle_dt(&led3);
-
-        k_msleep(100);
-
-        gpio_pin_toggle_dt(&led3);
-
-        k_msleep(100);
-
-        gpio_pin_toggle_dt(&led3);
-
-        k_msleep(100);
-
-        gpio_pin_toggle_dt(&led3);
-
-        k_msleep(100);
+        for (int i =0; i < 5; i++){
+            TurnOnLED(led2, 100);
+            TurnOnLED(led3, 100);
+            TurnOnLED(led1, 100);
+            TurnOnLED(led0, 100);
+        }
+        
     }
 
     return 0;
