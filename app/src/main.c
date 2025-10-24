@@ -24,7 +24,13 @@ int main(void) {
     return 0;
   }
 
+  state_machine_init();
+
   while(1) {
+    int ret = state_machine_run();
+    if (0 > ret) {
+      return 0;
+    }
     k_msleep(SLEEP_MS);
   }
 	return 0;
