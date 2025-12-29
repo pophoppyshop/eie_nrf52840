@@ -28,13 +28,13 @@
 #define BLE_CUSTOM_SERVICE_UUID BT_UUID_128_ENCODE(0x12345678, 0x1234, 0x5678, 0x1234, 0x56789abcdef0)
 #define BLE_CUSTOM_CHARACTERISTIC_UUID BT_UUID_128_ENCODE(0x12345678, 0x1234, 0x5678, 0x1234, 0x56789abcdef2)
 
-#define  BLE_CUSTOM_CHARACTERISTIC_MAX_DATA_LENGTH 20
+#define BLE_CUSTOM_CHARACTERISTIC_MAX_DATA_LENGTH 20
 
 // Advertising packets
 static const struct bt_data ble_advertising_data[] = {
-  BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NOBREDR) ),
+  BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR) ),
   BT_DATA(BT_DATA_NAME_COMPLETE, CONFIG_BT_DEVICE_NAME, sizeof(CONFIG_BT_DEVICE_NAME)),
-}
+};
 
 // Characteristic data buffer
 static uint8_t ble_custom_characteristic_user_data[20] = {};
@@ -64,7 +64,7 @@ static ssize_t ble_custom_characteristic_write_cb(struct bt_conn* conn, const st
 
 // Service & characteristic description
 static const struct bt_uuid_128 ble_custom_service_uuid = BT_UUID_INIT_128(BLE_CUSTOM_SERVICE_UUID);
-static const struct bt_uuid_128 ble_custrom_characteristic_uuid = BT_UUID_INIT_128(BLE_CUSTOM_CHARACTERISTIC_UUID);
+static const struct bt_uuid_128 ble_custom_characteristic_uuid = BT_UUID_INIT_128(BLE_CUSTOM_CHARACTERISTIC_UUID);
 
 BT_GATT_SERVICE_DEFINE(
   ble_custom_service, // Name of struct with config
