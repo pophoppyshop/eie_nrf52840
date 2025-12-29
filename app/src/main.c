@@ -25,7 +25,10 @@
 #define SLEEP_MS 1
 
 // Defines two UUIDS (service, characteristic)
-#define s BT_UUID_128_ENCODE(0x12345678, 0x1234, 0x5678, 0x1234, 0x56789abcdef0)
+#define BLE_CUSTOM_SERVICE_UUID BT_UUID_128_ENCODE(0x12345678, 0x1234, 0x5678, 0x1234, 0x56789abcdef0)
+#define BLE_CUSTOM_CHARACTERISTIC_UUID BT_UUID_128_ENCODE(0x12345678, 0x1234, 0x5678, 0x1234, 0x56789abcdef0)
+
+#define  BLE_CUSTOM_CHARACTERISTIC_MAX_DATA_LENGTH 20
 
 // Advertising packets
 static const struct bt_data ble_advertising_data[] = {
@@ -60,8 +63,8 @@ static ssize_t ble_custom_characteristic_write_cb(struct bt_conn* conn, const st
     }
 
 // Service & characteristic description
-static const struct bt_uuid_128 ble_custom_service_uuid = BT_UUID_INIT_128(s);
-static const struct bt_uuid_128 ble_custrom_characteristic_uuid = BT_UUID_INIT_128(s);
+static const struct bt_uuid_128 ble_custom_service_uuid = BT_UUID_INIT_128(BLE_CUSTOM_SERVICE_UUID);
+static const struct bt_uuid_128 ble_custrom_characteristic_uuid = BT_UUID_INIT_128(BLE_CUSTOM_CHARACTERISTIC_UUID);
 
 int main(void) {
 
