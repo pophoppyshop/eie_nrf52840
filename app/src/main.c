@@ -83,27 +83,21 @@ BT_GATT_SERVICE_DEFINE(
 int main(void) {
   int result = bt_enable(NULL);
 
-  if (result){
-    printk("Error ", result);
-
+  if (result) {
+    printk("Bluetooth init failed (err %d)\n", result);
     return 0;
-  }
-  else
-  {
-    printk("Initialization successful!");
+  } else {
+    printk("Bluetooth initialized!\n");
   }
 
   result = bt_le_adv_start(BT_LE_ADV_CONN_FAST_1, &ble_advertising_data, ARRAY_SIZE(ble_advertising_data), 
     NULL, 0);
 
-  if (result){
-    printk("Error ", result);
-
+  if (result) {
+    printk("Bluetooth init failed (err %d)\n", result);
     return 0;
-  }
-  else
-  {
-    printk("Advertising start successful!");
+  } else {
+    printk("Advertising initialized!\n");
   }
   
   while(1) {
