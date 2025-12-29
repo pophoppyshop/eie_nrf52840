@@ -22,7 +22,7 @@
 #include "BTN.h"
 #include "LED.h"
 
-#define SLEEP_MS 1
+#define SLEEP_MS 1000
 
 // Defines two UUIDS (service, characteristic)
 #define BLE_CUSTOM_SERVICE_UUID BT_UUID_128_ENCODE(0x12345678, 0x1234, 0x5678, 0x1234, 0x56789abcdef0)
@@ -37,9 +37,21 @@ static const struct bt_data ble_advertising_data[] = {
   BT_DATA(BT_DATA_NAME_COMPLETE, CONFIG_BT_DEVICE_NAME, sizeof(CONFIG_BT_DEVICE_NAME)),
 };
 
+static const struct bt_data ble_scan_response_data[] = {
+    BT_DATA(BT_DATA_NAME_COMPLETE, CONFIG_BT_DEVICE_NAME, sizeof(CONFIG_BT_DEVICE_NAME) - 1),
+};
+
 // Characteristic data buffer
-static uint8_t ble_custom_characteristic_user_data[20] = {};
-static uint8_t ble_characteristic_2_user_data[20] = {};
+static uint8_t ble_custom_characteristic_user_data[BLE_CUSTOM_CHARACTERISTIC_MAX_DATA_LENGTH + 1] =
+    {'E', 'i', 'E'};;
+
+// Service & characteristic description
+static const struct bt_uuid_128 ble_custom_service_uuid = BT_UUID_INIT_128(BLE_CUSTOM_SERVICE_UUID);
+static const struct bt_uuid_128 ble_custom_characteristic_uuid = BT_UUID_INIT_128(BLE_CUSTOM_CHARACTERISTIC_UUID);
+static const struct bt_uuid_128 ble_characteristic_2_uuid = BT_UUID_INIT_128(BLE_CHARACTERISTIC_2_UUID);
+
+
+// FUNCTIONS
 
 // Read callback (send current stored value in characteristic)
 static ssize_t ble_custom_characteristic_read_cb(struct bt_conn* conn, const struct bt_gatt_attr* attr,
@@ -63,12 +75,7 @@ static ssize_t ble_custom_characteristic_write_cb(struct bt_conn* conn, const st
       value_ptr[offset + len] = 0;
 
       return len;
-    }
-
-// Service & characteristic description
-static const struct bt_uuid_128 ble_custom_service_uuid = BT_UUID_INIT_128(BLE_CUSTOM_SERVICE_UUID);
-static const struct bt_uuid_128 ble_custom_characteristic_uuid = BT_UUID_INIT_128(BLE_CUSTOM_CHARACTERISTIC_UUID);
-static const struct bt_uuid_128 ble_characteristic_2_uuid = BT_UUID_INIT_128(BLE_CHARACTERISTIC_2_UUID);
+}
 
 BT_GATT_SERVICE_DEFINE(
   ble_custom_service, // Name of struct with config
@@ -76,8 +83,8 @@ BT_GATT_SERVICE_DEFINE(
 
   BT_GATT_CHARACTERISTIC(
     &ble_custom_characteristic_uuid.uuid,  // Setting the characteristic UUID
-    BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE | BT_GATT_CHRC_NOTIFY,  // Possible operations
-    BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,  // Permissions that connecting devices have
+    BT_GATT_CHRC_READ | BT_GATT_CHRC_NOTIFY,  // Possible operations
+    BT_GATT_PERM_READ,  // Permissions that connecting devices have
     ble_custom_characteristic_read_cb,     // Callback for when this characteristic is read from
     ble_custom_characteristic_write_cb,    // Callback for when this characteristic is written to
     ble_custom_characteristic_user_data    // Initial data stored in this characteristic
@@ -85,14 +92,27 @@ BT_GATT_SERVICE_DEFINE(
 
   BT_GATT_CHARACTERISTIC(
     &ble_characteristic_2_uuid.uuid,  // Setting the characteristic UUID
-    BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE | BT_GATT_CHRC_NOTIFY,  // Possible operations
-    BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,  // Permissions that connecting devices have
+    BT_GATT_CHRC_WRITE,  // Possible operations
+    BT_GATT_PERM_WRITE,  // Permissions that connecting devices have
     ble_custom_characteristic_read_cb,     // Callback for when this characteristic is read from
     ble_custom_characteristic_write_cb,    // Callback for when this characteristic is written to
-    ble_characteristic_2_user_data    // Initial data stored in this characteristic
+    ble_custom_characteristic_user_data    // Initial data stored in this characteristic
   ),
+
+  BT_GATT_CCC(  // Client characteristic configuration for the above custom characteristic
+        NULL,     // Callback for when this characteristic is changed
+        BT_GATT_PERM_READ | BT_GATT_PERM_WRITE  // Permissions that connecting devices have
+        ),
 );
 
+static void ble_custom_service_notify(){
+  static uint32_t counter = 0;
+  bt_gatt_notify(NULL, &ble_custom_service.attrs[2], &counter, sizeof(counter));
+  counter++;
+}
+
+
+// MAIN
 int main(void) {
   int result = bt_enable(NULL);
 
@@ -104,7 +124,7 @@ int main(void) {
   }
 
   result = bt_le_adv_start(BT_LE_ADV_CONN_FAST_1, ble_advertising_data, ARRAY_SIZE(ble_advertising_data), 
-    NULL, 0);
+    ble_scan_response_data, ARRAY_SIZE(ble_scan_response_data));
 
   if (result) {
     printk("Bluetooth init failed (err %d)\n", result);
@@ -115,6 +135,8 @@ int main(void) {
   
   while(1) {
     k_msleep(SLEEP_MS);
+
+    ble_custom_service_notify();
   }
 	return 0;
 }
