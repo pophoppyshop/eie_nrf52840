@@ -24,6 +24,11 @@
 
 #define SLEEP_MS 1
 
+// Defines two UUIDS (service, characteristic)
+#define BT_UUID_128_ENCODE(0x12345678, 0x1234, 0x5678, 0x1234, 0x56789abcdef0)
+
+// Advertising packets
+
 int main(void) {
 
   if (0 > BTN_init()) {
