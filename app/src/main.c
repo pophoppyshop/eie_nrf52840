@@ -83,7 +83,14 @@ BT_GATT_SERVICE_DEFINE(
     ble_custom_characteristic_user_data    // Initial data stored in this characteristic
   ),
 
-  
+  BT_GATT_CHARACTERISTIC(
+    &ble_characteristic_2_uuid.uuid,  // Setting the characteristic UUID
+    BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE | BT_GATT_CHRC_NOTIFY,  // Possible operations
+    BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,  // Permissions that connecting devices have
+    ble_custom_characteristic_read_cb,     // Callback for when this characteristic is read from
+    ble_custom_characteristic_write_cb,    // Callback for when this characteristic is written to
+    ble_characteristic_2_user_data    // Initial data stored in this characteristic
+  ),
 );
 
 int main(void) {
@@ -96,7 +103,7 @@ int main(void) {
     printk("Bluetooth initialized!\n");
   }
 
-  result = bt_le_adv_start(BT_LE_ADV_CONN_FAST_1, &ble_advertising_data, ARRAY_SIZE(ble_advertising_data), 
+  result = bt_le_adv_start(BT_LE_ADV_CONN_FAST_1, ble_advertising_data, ARRAY_SIZE(ble_advertising_data), 
     NULL, 0);
 
   if (result) {
