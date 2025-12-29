@@ -81,7 +81,30 @@ BT_GATT_SERVICE_DEFINE(
 );
 
 int main(void) {
-  
+  int result = bt_enable(NULL);
+
+  if (result){
+    printk("Error ", result);
+
+    return 0;
+  }
+  else
+  {
+    printk("Initialization successful!");
+  }
+
+  result = bt_le_adv_start(BT_LE_ADV_CONN_FAST_1, &ble_advertising_data, ARRAY_SIZE(ble_advertising_data), 
+    NULL, 0);
+
+  if (result){
+    printk("Error ", result);
+
+    return 0;
+  }
+  else
+  {
+    printk("Advertising start successful!");
+  }
   
   while(1) {
     k_msleep(SLEEP_MS);
