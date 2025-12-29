@@ -28,6 +28,10 @@
 #define BT_UUID_128_ENCODE(0x12345678, 0x1234, 0x5678, 0x1234, 0x56789abcdef0)
 
 // Advertising packets
+static const struct bt_data ble_advertising_data[] = {
+  BT_DATA_BYTES(BT_DATA_FLAGS, BT_LE_AD_GENERAL, ),
+  BT_DATA(),
+}
 
 int main(void) {
 
