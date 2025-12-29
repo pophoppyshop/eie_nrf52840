@@ -26,7 +26,7 @@
 
 // Defines two UUIDS (service, characteristic)
 #define BLE_CUSTOM_SERVICE_UUID BT_UUID_128_ENCODE(0x12345678, 0x1234, 0x5678, 0x1234, 0x56789abcdef0)
-#define BLE_CUSTOM_CHARACTERISTIC_UUID BT_UUID_128_ENCODE(0x12345678, 0x1234, 0x5678, 0x1234, 0x56789abcdef0)
+#define BLE_CUSTOM_CHARACTERISTIC_UUID BT_UUID_128_ENCODE(0x12345678, 0x1234, 0x5678, 0x1234, 0x56789abcdef2)
 
 #define  BLE_CUSTOM_CHARACTERISTIC_MAX_DATA_LENGTH 20
 
@@ -65,6 +65,20 @@ static ssize_t ble_custom_characteristic_write_cb(struct bt_conn* conn, const st
 // Service & characteristic description
 static const struct bt_uuid_128 ble_custom_service_uuid = BT_UUID_INIT_128(BLE_CUSTOM_SERVICE_UUID);
 static const struct bt_uuid_128 ble_custrom_characteristic_uuid = BT_UUID_INIT_128(BLE_CUSTOM_CHARACTERISTIC_UUID);
+
+BT_GATT_SERVICE_DEFINE(
+  ble_custom_service, // Name of struct with config
+  BT_GATT_PRIMARY_SERVICE(&ble_custom_service_uuid), // setting the service UUID
+
+  BT_GATT_CHARACTERISTIC(
+    &ble_custom_characteristic_uuid.uuid,  // Setting the characteristic UUID
+    <BT_GATT_CHRC_* values ORd together>,  // Possible operations
+    <BT_GATT_PERM_* values ORd together>,  // Permissions that connecting devices have
+    ble_custom_characteristic_read_cb,     // Callback for when this characteristic is read from
+    ble_custom_characteristic_write_cb,    // Callback for when this characteristic is written to
+    ble_custom_characteristic_user_data    // Initial data stored in this characteristic
+  ),
+);
 
 int main(void) {
 
