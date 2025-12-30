@@ -24,6 +24,10 @@
 
 #define SLEEP_MS 1000
 
+// Commands
+const uint8_t CMD_LED_ON[] = {'L', 'E', 'D', ' ', 'O', 'N'};
+const uint8_t CMD_LED_OFF[] = {'L', 'E', 'D', ' ', 'O', 'F', 'F'};
+
 // Defines UUIDS (service, characteristic)
 #define BLE_CUSTOM_SERVICE_UUID BT_UUID_128_ENCODE(0x12345678, 0x1234, 0x5678, 0x1234, 0x56789abcdef0)
 #define BLE_CUSTOM_CHARACTERISTIC_UUID BT_UUID_128_ENCODE(0x12345678, 0x1234, 0x5678, 0x1234, 0x56789abcdef1)
@@ -39,9 +43,10 @@ static const struct bt_data ble_advertising_data[] = {
   BT_DATA(BT_DATA_NAME_COMPLETE, CONFIG_BT_DEVICE_NAME, sizeof(CONFIG_BT_DEVICE_NAME)),
 };
 
-// Characteristic data buffer
+// Characteristic data buffer (inital value)
 static uint8_t ble_custom_characteristic_user_data[BLE_CUSTOM_CHARACTERISTIC_MAX_DATA_LENGTH + 1] =
-    {'E', 'i', 'E'};;
+    {'E', 'i', 'E'};
+
 
 // Service & characteristic description
 static const struct bt_uuid_128 ble_custom_service_uuid = BT_UUID_INIT_128(BLE_CUSTOM_SERVICE_UUID);
@@ -73,6 +78,27 @@ static ssize_t ble_custom_characteristic_write_cb(struct bt_conn* conn, const st
 
       memcpy(value_ptr + offset, buf, len);
       value_ptr[offset + len] = 0;
+
+      // Toggle LED based on data
+      bool led_on = true;
+      bool led_off = true;
+
+      for (uint16_t i = 0; i < len; i++) {
+        if (CMD_LED_OFF[i] != value_ptr[offset + i]) {
+          led_off = false;
+        }
+        if (CMD_LED_ON[i] != value_ptr[offset + i])
+        {
+          led_on = false;
+        }
+      }
+
+      if (led_on) {
+        LED_set(LED0, true);
+      }
+      else if (led_off) {
+        LED_set(LED0, false);
+      }
 
       return len;
 }
@@ -111,16 +137,16 @@ BT_GATT_SERVICE_DEFINE(
     ),
 );
 
-static void ble_custom_service_notify(){
+static void ble_custom_service_notify(int direction){
   static uint32_t counter = 0;
   bt_gatt_notify(NULL, &ble_custom_service.attrs[2], &counter, sizeof(counter));
-  counter++;
+  counter += direction;
 }
-
 
 // MAIN
 int main(void) {
   int result = bt_enable(NULL);
+  int notify_direction = 1;
 
   if (result) {
     printk("Bluetooth init failed (err %d)\n", result);
@@ -138,11 +164,26 @@ int main(void) {
   } else {
     printk("Advertising initialized!\n");
   }
+
+  // Init buttons and LEDs
+  if (0 > BTN_init() ) {
+    printk("Button init failed\n");
+    return 0;
+  }
+  if (0 > LED_init() ) {
+    printk("LED init failed\n");
+    return 0;
+  }
+  
   
   while(1) {
     k_msleep(SLEEP_MS);
 
-    ble_custom_service_notify();
+    if (BTN_check_clear_pressed(BTN0)) {
+      notify_direction *= -1;
+    }
+
+    ble_custom_service_notify(notify_direction);
   }
 	return 0;
 }
