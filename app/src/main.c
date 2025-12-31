@@ -24,6 +24,9 @@
 
 #define SLEEP_MS 1000
 
+// Flag for read callback
+bool led_is_on = false;
+
 // Commands
 const uint8_t CMD_LED_ON[] = {'L', 'E', 'D', ' ', 'O', 'N'};
 const uint8_t CMD_LED_OFF[] = {'L', 'E', 'D', ' ', 'O', 'F', 'F'};
@@ -44,8 +47,7 @@ static const struct bt_data ble_advertising_data[] = {
 };
 
 // Characteristic data buffer (inital value)
-static uint8_t ble_custom_characteristic_user_data[BLE_CUSTOM_CHARACTERISTIC_MAX_DATA_LENGTH + 1] =
-    {'E', 'i', 'E'};
+static uint8_t ble_custom_characteristic_user_data[BLE_CUSTOM_CHARACTERISTIC_MAX_DATA_LENGTH + 1] = {'L', 'E', 'D', ' ', 'O', 'F', 'F'};
 
 
 // Service & characteristic description
@@ -62,42 +64,53 @@ static const struct bt_uuid_128 ble_characteristic_2_uuid = BT_UUID_INIT_128(BLE
 static ssize_t ble_custom_characteristic_read_cb(struct bt_conn* conn, const struct bt_gatt_attr* attr,
     void* buf, uint16_t len, uint16_t offset) {
 
-      const char* value = attr->user_data;
-      return bt_gatt_attr_read(conn, attr, buf, len, offset, value, strlen(value));
+      //const char* value = attr->user_data;
+
+      // Return LED status
+      if (led_is_on) {
+        return bt_gatt_attr_read(conn, attr, buf, len, offset, "LED ON", strlen("LED ON"));
+      }
+
+      return bt_gatt_attr_read(conn, attr, buf, len, offset, "LED OFF", strlen("LED OFF"));
 }
 
 // Write callback (save to characteristic data buffer)
 static ssize_t ble_custom_characteristic_write_cb(struct bt_conn* conn, const struct bt_gatt_attr* attr,
     const void* buf, uint16_t len, uint16_t offset,
     uint8_t flags) {
-      uint8_t* value_ptr = attr->user_data;
-
       if (offset + len > BLE_CUSTOM_CHARACTERISTIC_MAX_DATA_LENGTH) {
         return BT_GATT_ERR(BT_ATT_ERR_INVALID_OFFSET);
-      }
+      }      
 
-      memcpy(value_ptr + offset, buf, len);
-      value_ptr[offset + len] = 0;
+      uint8_t* value = attr->user_data;
+      memcpy(value + offset, buf, len); // Saves written data to characteristic buffer
+      value[offset + len] = 0;
 
       // Toggle LED based on data
       bool led_on = true;
       bool led_off = true;
 
+      // Check if command matches
       for (uint16_t i = 0; i < len; i++) {
-        if (CMD_LED_OFF[i] != value_ptr[offset + i]) {
+        if (CMD_LED_OFF[i] != value[offset + i]) {
           led_off = false;
         }
-        if (CMD_LED_ON[i] != value_ptr[offset + i])
+        if (CMD_LED_ON[i] != value[offset + i])
         {
           led_on = false;
         }
       }
 
-      if (led_on) {
-        LED_set(LED0, true);
-      }
-      else if (led_off) {
-        LED_set(LED0, false);
+      // Turn LED off/on
+      if (led_on || led_off) {
+        if (led_on) {
+          LED_set(LED0, true);
+          led_is_on = true;
+        }
+        if (led_off) {
+          LED_set(LED0, false);
+          led_is_on = false;
+        }
       }
 
       return len;
@@ -174,7 +187,6 @@ int main(void) {
     printk("LED init failed\n");
     return 0;
   }
-  
   
   while(1) {
     k_msleep(SLEEP_MS);
