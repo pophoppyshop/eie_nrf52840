@@ -129,17 +129,17 @@ static enum smf_state_result enter_code_run(void* o) {
 
     // Clear code when BTN2 pressed ------------------
     if (BTN_check_clear_pressed(BTN2)) {
-        machine.current_code = 0;
-        machine.code_index = 0;
-
         // Turn off LED2
         if (machine.code_index == 8)
             LED_set(LED2, false);
+
+        machine.current_code = 0;
+        machine.code_index = 0;
     }
 
     // Save code when BTN3 pressed -------------------
     if (BTN_check_clear_pressed(BTN3) && machine.code_index == 8) {
-        string_buffer[machine.string_index] = machine.current_code;
+        machine.string_buffer[machine.string_index] = machine.current_code;
 
         machine.string_index++;
 
