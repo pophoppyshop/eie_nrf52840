@@ -59,7 +59,7 @@ static state_machine_t machine;
 void state_machine_init() {
     // Initialize variables
     machine.current_code = 0;
-    machine.code_index = 0;
+    machine.code_index = 7;
     machine.string_index = 0;
     machine.LED0_state = false, machine.LED1_state = false;
     memset(machine.string_buffer, 0, sizeof(machine.string_buffer));
@@ -77,13 +77,13 @@ int state_machine_run() {
 */
 void add_to_code(int bit){
     // Add code and increase index
-    if (machine.code_index < 8) {
+    if (machine.code_index >= 0) {
         machine.current_code += bit * pow(2, machine.code_index);
 
-        machine.code_index++;
+        machine.code_index--;
 
         // LED2 on once
-        if (machine.code_index == 8)
+        if (machine.code_index == -1)
             LED_set(LED2, true);
     }
 }
@@ -130,22 +130,22 @@ static enum smf_state_result enter_code_run(void* o) {
     // Clear code when BTN2 pressed ------------------
     if (BTN_check_clear_pressed(BTN2)) {
         // Turn off LED2
-        if (machine.code_index == 8)
+        if (machine.code_index == -1)
             LED_set(LED2, false);
 
         machine.current_code = 0;
-        machine.code_index = 0;
+        machine.code_index = 7;
     }
 
     // Save code when BTN3 pressed and 8 bits entered -------------------
-    if (BTN_check_clear_pressed(BTN3) && machine.code_index == 8) {
+    if (BTN_check_clear_pressed(BTN3) && machine.code_index == -1) {
         machine.string_buffer[machine.string_index] = machine.current_code;
 
         machine.string_index++;
 
         // Reset code variables
         machine.current_code = 0;
-        machine.code_index = 0;
+        machine.code_index = 7;
 
         // Turn off LED2
         LED_set(LED2, false);
@@ -226,7 +226,50 @@ static void send_monitor_entry(void* o) {
 }
 
 static enum smf_state_result send_monitor_run(void* o) {
+    // Turn on LED0 when BTN0 pressed -----------------
+    if (BTN_is_pressed(BTN0) && !machine.LED0_state) {
+        LED_set(LED0, true);
 
+        machine.LED0_state = true;
+    }
+    // Turn off LED0 when BTN0 released
+    else if (!BTN_is_pressed(BTN0) && machine.LED0_state) {
+        LED_set(LED0, false);
+
+        machine.LED0_state = false;
+    }
+    
+    // Turn on LED1 when BTN1 pressed -----------------
+    if (BTN_is_pressed(BTN1) && !machine.LED1_state) {
+        LED_set(LED1, true);
+
+        machine.LED1_state = true;
+    }
+    // Turn off LED1 when BTN1 released
+    else if (!BTN_is_pressed(BTN1) && machine.LED1_state) {
+        LED_set(LED1, false);
+
+        machine.LED1_state = false;
+    }
+
+    // Clear string when BTN2 pressed ------------------
+    if (BTN_check_clear_pressed(BTN2)) {
+        machine.string_index = 0;
+        memset(machine.string_buffer, 0, sizeof(machine.string_buffer));
+
+        smf_set_state(SMF_CTX(&machine), &states[ENTER_CODE]);
+    }
+
+    // Send to serial monitor when BTN3 pressed -------------------
+    if (BTN_check_clear_pressed(BTN3)) {
+        printk("String: ");
+
+        char* char_ptr = (char*) machine.string_buffer;
+
+        printk("%s", char_ptr);
+
+        printk("\n");
+    }
 
     return SMF_EVENT_HANDLED;
 }
