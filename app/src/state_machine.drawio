@@ -1,19 +1,19 @@
 <mxfile host="65bd71144e">
     <diagram id="L1SSKUEYUafm-VI5QB9k" name="Page-1">
-        <mxGraphModel dx="236" dy="138" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="701" dy="497" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
                 <mxCell id="40" style="edgeStyle=none;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="2" target="17" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
-                            <mxPoint x="290" y="360"/>
+                            <mxPoint x="275" y="360"/>
                             <mxPoint x="390" y="360"/>
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="2" value="S0&lt;div&gt;-&amp;nbsp;&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;BTN0 and BTN1 to enter&amp;nbsp;&lt;/span&gt;a 8-bit ASCII code.&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;- BTN2 to clear bits.&lt;/span&gt;&lt;/div&gt;&lt;div&gt;- BTN3 to save code.&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(63, 63, 63); background-color: transparent;&quot;&gt;- LED3 at 1 Hz&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="200" y="140" width="120" height="110" as="geometry"/>
+                <mxCell id="2" value="S0&lt;div&gt;-&amp;nbsp;&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;BTN0 and BTN1 to enter&amp;nbsp;&lt;/span&gt;a 8-bit ASCII code.&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;- BTN2 to clear bits.&lt;/span&gt;&lt;/div&gt;&lt;div&gt;- BTN3 to save code.&lt;/div&gt;&lt;div&gt;- LED2 signal that 8 bits have been entered&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(63, 63, 63); background-color: transparent;&quot;&gt;- LED3 at 1 Hz&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="140" y="140" width="180" height="120" as="geometry"/>
                 </mxCell>
                 <mxCell id="4" style="edgeStyle=none;html=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=0;" parent="1" source="2" target="9" edge="1">
                     <mxGeometry relative="1" as="geometry">
@@ -28,7 +28,7 @@
                         <mxPoint x="390" y="570" as="targetPoint"/>
                         <Array as="points">
                             <mxPoint x="390" y="560"/>
-                            <mxPoint x="260" y="560"/>
+                            <mxPoint x="230" y="560"/>
                         </Array>
                     </mxGeometry>
                 </mxCell>
@@ -62,7 +62,7 @@
                         <Array as="points">
                             <mxPoint x="450" y="290"/>
                             <mxPoint x="370" y="290"/>
-                            <mxPoint x="309" y="290"/>
+                            <mxPoint x="304" y="290"/>
                         </Array>
                     </mxGeometry>
                 </mxCell>
@@ -119,7 +119,7 @@
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
                             <mxPoint x="664" y="330"/>
-                            <mxPoint x="308" y="330"/>
+                            <mxPoint x="303" y="330"/>
                         </Array>
                     </mxGeometry>
                 </mxCell>
