@@ -6,6 +6,7 @@
 #include <inttypes.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/bluetooth/conn.h>
 #include <zephyr/bluetooth/gatt.h>
@@ -81,11 +82,7 @@ static void ble_on_advertisement_received(const bt_addr_le_t* addr, int8_t rssi,
     return;
   }
 
-  char phone[32] = {48, 53 , 57, 49};
-
-  printk("Comparing to target: %s\n", phone);
-
-  if (name == phone)
+  if (strcmp(name, "0591") == 0)
   {
     bt_le_scan_stop();
 
