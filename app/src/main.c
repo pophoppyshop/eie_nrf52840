@@ -28,7 +28,7 @@
 static const struct gpio_dt_spec dcx_gpio = GPIO_DT_SPEC_GET(ZEPHYR_USER_NODE, dcx_gpios);
 static const struct spi_cs_control cs_ctrl = (struct spi_cs_control) {
   .gpio = GPIO_DT_SPEC_GET(ARDUINO_SPI_NODE, cs_gpios),
-  .delay = 0u,
+  .delay = 1u,
 };
 
 static const struct device* dev = DEVICE_DT_GET(ARDUINO_SPI_NODE);
@@ -60,25 +60,6 @@ static void lcd_cmd(uint8_t cmd, struct spi_buf* data) {
   }
 }
 
-// For drawing on board
-uint8_t column_data[] = {0x00, 0x95, 0x00, 0x9f}; // Columns 149 to 159
-uint8_t row_data[] = {0x00, 0x75, 0x00, 0x7F};    // Rows 117 to 127
-uint8_t color_data[300];
-
-for (int i = 0; i < 300; i += 3) {
-  color_data[i] = 0xFC; // Red
-  color_data[i + 1] = 0;
-  color_data[i + 2] = 0;
-}
-
-struct spi_buf column_data_buf = {column_data, 4};
-struct spi_buf row_data_buf = {row_data, 4};
-struct spi_buf color_data_buf = {color_data, 300};
-
-lcd_cmd(CMD_COLUMN_ADDRESS_SET, &column_data_buf);
-lcd_cmd(CMD_ROW_ADDRESS_SET, &row_data_buf);
-lcd_cmd(CMD_MEMORY_WRITE, &color_data_buf);
-
 int main(void) {
   if(!device_is_ready(dev)) {
     return 0;
@@ -98,12 +79,30 @@ int main(void) {
     return 0;
   }
 
+  // For drawing on board
+  uint8_t column_data[] = {0x00, 0x95, 0x00, 0x9f}; // Columns 149 to 159
+  uint8_t row_data[] = {0x00, 0x75, 0x00, 0x7F};    // Rows 117 to 127
+  uint8_t color_data[300];
+
+  for (int i = 0; i < 300; i += 3) {
+    color_data[i] = 0; // blue
+    color_data[i + 1] = 0; // green
+    color_data[i + 2] = 0XFC;
+  }
+
+  struct spi_buf column_data_buf = {column_data, 4};
+  struct spi_buf row_data_buf = {row_data, 4};
+  struct spi_buf color_data_buf = {color_data, 300};
+
   lcd_cmd(CMD_SOFTWARE_RESET, NULL);
   k_msleep(120); // Software reset command can take up to 120ms to complete
 
   lcd_cmd(CMD_SLEEP_OUT, NULL);
   lcd_cmd(CMD_DISPLAY_ON, NULL);
 
+  lcd_cmd(CMD_COLUMN_ADDRESS_SET, &column_data_buf);
+  lcd_cmd(CMD_ROW_ADDRESS_SET, &row_data_buf);
+  lcd_cmd(CMD_MEMORY_WRITE, &color_data_buf);
 
   while(1) {
     k_msleep(SLEEP_MS);

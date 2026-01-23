@@ -19,8 +19,8 @@
         };
     };
 
-    zephyr, user {
-        dcx_gpios = <&gpiol 11 GPIO_ACTIVE_HIGH>;
+    zephyr,user {
+        dcx_gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;
     };
 
     arduino_spi {
