@@ -16,7 +16,36 @@
 
 #define SLEEP_MS 1
 
+static const struct device* display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
+static lv_obj_t* screen = NULL;
+
+static void event_handler(lv_event_t* e) {
+  // Handle events here
+  lv_event_code_t code = lv_event_get_code(e);
+
+  if (code == LV_EVENT_CLICKED) {
+    // Handle click event
+    printk("Clicked!\n");
+  }
+  else if (code == LV_EVENT_VALUE_CHANGED) {
+    // Handle press event
+    printk("Toggled!\n");
+  }
+}
+
 int main(void) {
+  if (!device_is_ready(display_dev)) {
+    printk("Display device not found\n");
+    return 0;
+  }
+
+  screen = lv_screen_active();
+
+  if (screen == NULL) {
+    printk("Failed to get active screen\n");
+    return 0;
+  }
+
   if (0 > BTN_init()) {
     return 0;
   }
@@ -24,16 +53,32 @@ int main(void) {
     return 0;
   }
 
-  int8_t oxygen1 = 100;
-  int8_t oxygen2 = 100;
-  int8_t oxygen3 = 100;
-  int8_t oxygen4 = 100;
+  /* TEST BUTTON */
+  lv_obj_t * label;
+
+  lv_obj_t* btn = lv_button_create(screen);
+  lv_obj_add_event_cb(btn, event_handler, LV_EVENT_ALL, NULL);
+  lv_obj_align(btn, LV_ALIGN_CENTER, 0, 0);
+  lv_obj_add_flag(btn, LV_OBJ_FLAG_CHECKABLE);
+  lv_obj_set_height(btn, LV_SIZE_CONTENT);
+
+  label = lv_label_create(btn);
+  lv_label_set_text(label, "Click me!");
+  lv_obj_center(label);
+
+  display_blanking_off(display_dev);
+
+  /* OXYGEN */
+  int8_t oxygens[] = {100, 100, 100, 100};
   uint8_t oxygenCooldown = 118;
   uint8_t numberOfLEDsOn = 4;
   uint8_t oxygenSubtract = 1;
+  enum btn_id_t buttons[] = {BTN0, BTN1, BTN2, BTN3};
 
   while (1) {
     k_msleep(SLEEP_MS);
+
+    lv_timer_handler();
 
     oxygenCooldown--;
 
@@ -44,30 +89,12 @@ int main(void) {
       numberOfLEDsOn = 0;
 
       // Decrease oxygen levels
-      if (oxygen1 > 0) {
-        oxygen1 -= oxygenSubtract;
-        numberOfLEDsOn++;
-
-        if (oxygen1 < 0) oxygen1 = 0;
-      }
-      if (oxygen2 > 0) {
-        oxygen2 -= oxygenSubtract;
-        numberOfLEDsOn++;
-
-        if (oxygen2 < 0) oxygen2 = 0;
-      }
-      if (oxygen3 > 0) {
-        oxygen3 -= oxygenSubtract;
-        numberOfLEDsOn++;
-
-        if (oxygen3 < 0) oxygen3 = 0;
-      }
-      else oxygen3 = 0;
-      if (oxygen4 > 0) {
-        oxygen4 -= oxygenSubtract;
-        numberOfLEDsOn++;
-
-        if (oxygen4 < 0) oxygen4 = 0;
+      for (int i = 0; i < 4; i++) {
+        if (oxygens[i] > 0) {
+          oxygens[i] -= oxygenSubtract;
+          numberOfLEDsOn++;
+        }
+        if (oxygens[i] < 0) oxygens[i] = 0;
       }
 
       // Speed up oxygen decrease based on number of LEDs on
@@ -81,47 +108,35 @@ int main(void) {
         oxygenSubtract = 1;
       }
 
-      printk("Oxygen subract: %i\n", oxygen3);
-
       // Increase oxygen when buttons pressed
-      if (BTN_is_pressed(BTN0) && oxygen1 < 100) {\
-        if (oxygen1 <= 0) {
-          numberOfLEDsOn++;
-        }
+      for (int i = 0; i < 4; i++) {
+        enum btn_id_t button = buttons[i];
 
-        oxygen1 += 10;
-      }
-      if (BTN_is_pressed(BTN1) && oxygen2 < 100) {
-        if (oxygen2 <= 0) {
-          numberOfLEDsOn++;
-        }
+        if (BTN_is_pressed(button) && oxygens[i] < 100) {
+          if (oxygens[i] <= 0) {
+            numberOfLEDsOn++;
+          }
 
-        oxygen2 += 10;
-      }
-      if (BTN_is_pressed(BTN2) && oxygen3 < 100) {
-        if (oxygen3 <= 0) {
-          numberOfLEDsOn++;
+          oxygens[i] += 10;
         }
-
-        oxygen3 += 10;
-      }
-      if (BTN_is_pressed(BTN3) && oxygen4 < 100) {
-        if (oxygen4 <= 0) {
-          numberOfLEDsOn++;
-        }
-
-        oxygen4 += 10;
       }
     }
 
     // Update LED brightness based on oxygen levels
-    LED_pwm(LED0, oxygen1);
-    LED_pwm(LED1, oxygen2);
-    LED_pwm(LED2, oxygen3);
-    LED_pwm(LED3, oxygen4);
+    LED_pwm(LED0, oxygens[0]);
+    LED_pwm(LED1, oxygens[1]);
+    LED_pwm(LED2, oxygens[2]);
+    LED_pwm(LED3, oxygens[3]);
+
   }
   return 0;
 }
+
+/*
+void updateOxygen(uint8_t* oxygenCooldown, uint8_t* numberOfLEDsOn, uint8_t* oxygenSubtract) {
+
+}
+*/
 
 // General Premise
 // Quiz center (Kahoot Mini Pro XL 6th Edition (Taylor's series))
