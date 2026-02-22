@@ -27,10 +27,6 @@ static void event_handler(lv_event_t* e) {
     // Handle click event
     printk("Clicked!\n");
   }
-  else if (code == LV_EVENT_VALUE_CHANGED) {
-    // Handle press event
-    printk("Toggled!\n");
-  }
 }
 
 int main(void) {
@@ -54,18 +50,16 @@ int main(void) {
   }
 
   /* TEST IMAGE BUTTON */
-  LV_IMG_DECLATE()
-  lv_obj_t * label;
+  LV_IMAGE_DECLARE(Alien_thing);
 
   lv_obj_t* btn = lv_imgbtn_create(screen);
+  lv_imgbtn_set_src(btn, LV_IMGBTN_STATE_RELEASED, NULL, &Alien_thing, NULL);   // Set image
   lv_obj_add_event_cb(btn, event_handler, LV_EVENT_ALL, NULL);
-  lv_obj_align(btn, LV_ALIGN_CENTER, 0, 0);
-  lv_obj_add_flag(btn, LV_OBJ_FLAG_CHECKABLE);
-  lv_obj_set_height(btn, LV_SIZE_CONTENT);
+  lv_obj_align(btn, LV_ALIGN_CENTER, 0, 0);                               
 
-  label = lv_label_create(btn);
-  lv_label_set_text(label, "Click me!");
+  lv_obj_t * label = lv_label_create(btn);
   lv_obj_center(label);
+  lv_label_set_text(label, "");     // Remove text from button
 
   display_blanking_off(display_dev);
 
