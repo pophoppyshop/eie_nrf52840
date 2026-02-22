@@ -53,10 +53,11 @@ int main(void) {
     return 0;
   }
 
-  /* TEST BUTTON */
+  /* TEST IMAGE BUTTON */
+  LV_IMG_DECLATE()
   lv_obj_t * label;
 
-  lv_obj_t* btn = lv_button_create(screen);
+  lv_obj_t* btn = lv_imgbtn_create(screen);
   lv_obj_add_event_cb(btn, event_handler, LV_EVENT_ALL, NULL);
   lv_obj_align(btn, LV_ALIGN_CENTER, 0, 0);
   lv_obj_add_flag(btn, LV_OBJ_FLAG_CHECKABLE);
